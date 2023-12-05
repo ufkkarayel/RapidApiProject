@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using RapidApiProject.Models;
 using System.Net.Http.Headers;
 
 namespace RapidApiProject.Controllers
@@ -23,9 +25,10 @@ namespace RapidApiProject.Controllers
             {
                 response.EnsureSuccessStatusCode();
                 var body = await response.Content.ReadAsStringAsync();
-               
+               var values=JsonConvert.DeserializeObject<WeatherViewModel>(body);
+                return View(values.locations);
             }
-            return View();
+            
         }
     }
 }
