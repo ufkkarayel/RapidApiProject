@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
+using RapidApiProject.Models;
 using System.Net.Http.Headers;
 
 namespace RapidApiProject.Controllers
@@ -14,7 +16,7 @@ namespace RapidApiProject.Controllers
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri("https://booking-com.p.rapidapi.com/v1/hotels/locations?name=%C4%B0stanbul&locale=en-gb"),
+                    RequestUri = new Uri($"https://booking-com.p.rapidapi.com/v1/hotels/locations?name={city}&locale=en-gb"),
                     Headers =
     {
         { "X-RapidAPI-Key", "ed120ca162msh4a2cf1663625a24p1cae18jsn548260e0d857" },
@@ -25,10 +27,32 @@ namespace RapidApiProject.Controllers
                 {
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
-                    var values=JsonConvert.DeserializeObject<List<string>>(body);
-                    Console.WriteLine(body);
+                    var values = JsonConvert.DeserializeObject<List<SearchLocationViewModel>>(body);
+
+                    return View(values.ToList());
                 }
-                return View();
+            }
+            else
+            {
+                var client = new HttpClient();
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri("https://booking-com.p.rapidapi.com/v1/hotels/locations?name=&locale=en-gb"),
+                    Headers =
+    {
+        { "X-RapidAPI-Key", "ed120ca162msh4a2cf1663625a24p1cae18jsn548260e0d857" },
+        { "X-RapidAPI-Host", "booking-com.p.rapidapi.com" },
+    },
+                };
+                using (var response = await client.SendAsync(request))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var body = await response.Content.ReadAsStringAsync();
+                    var values = JsonConvert.DeserializeObject<List<SearchLocationViewModel>>(body);
+
+                    return View(values.ToList());
+                }
 
             }
           
